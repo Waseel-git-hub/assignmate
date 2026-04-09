@@ -13,6 +13,8 @@ class AddAssignmentScreen extends StatefulWidget {
 }
 
 class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
+  final FocusNode _subjectFocus = FocusNode();
+  final FocusNode _descriptionFocus = FocusNode();
   late TextEditingController _titleController;
   late TextEditingController _subjectController;
   late TextEditingController _descController;
@@ -26,6 +28,14 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
   late String _currentStatus;
 
   @override
+  void dispose() {
+    // Crucial: Clean them up when the screen closes
+    _subjectFocus.dispose();
+    _descriptionFocus.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     _titleController = TextEditingController(
@@ -37,8 +47,7 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
     _descController = TextEditingController(
       text: widget.assignment?.description ?? "",
     );
-    _selectedDate =
-        widget.assignment?.deadline ??
+    _selectedDate = widget.assignment?.deadline ??
         DateTime.now().add(const Duration(days: 1));
     _currentStatus = widget.assignment?.status ?? 'PENDING';
   }
@@ -77,11 +86,23 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
         padding: const EdgeInsets.all(24),
         children: [
           TextField(
+            autofocus: true,
+            textInputAction: TextInputAction.next,
             controller: _titleController,
+            onSubmitted: (_) {
+              // When 'Next' is pressed, jump to Subject
+              FocusScope.of(context).requestFocus(_subjectFocus);
+            },
             decoration: const InputDecoration(labelText: "Title"),
           ),
           const SizedBox(height: 16),
           TextField(
+            focusNode: _subjectFocus, // Tell this field it's the 'Subject' node
+            textInputAction: TextInputAction.next,
+            onSubmitted: (_) {
+              // When 'Next' is pressed, jump to Description
+              FocusScope.of(context).requestFocus(_descriptionFocus);
+            },
             controller: _subjectController,
             decoration: const InputDecoration(labelText: "Subject"),
           ),
@@ -90,6 +111,10 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
             controller: _descController,
             decoration: const InputDecoration(labelText: "Description"),
             maxLines: 3,
+            focusNode:
+                _descriptionFocus, // Tell this field it's the 'Description' node
+            textInputAction:
+                TextInputAction.done, // Shows 'Done' or 'Check' icon
           ),
           const SizedBox(height: 24),
           ListTile(
