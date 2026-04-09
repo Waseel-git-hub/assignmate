@@ -26,36 +26,51 @@ class AppTheme extends ChangeNotifier {
   static ThemeData _base(Brightness brightness, Color seed) {
     bool isDark = brightness == Brightness.dark;
 
+    // This is the magic part: Generate the color scheme first
+    final colorScheme = ColorScheme.fromSeed(
+      seedColor: seed,
+      brightness: brightness,
+    );
+
+    // Use the generated 'surfaceContainerLowest' for the deep background feel
+    // or 'surface' for a slightly lighter tinted background.
+    final Color dynamicBg =
+        isDark ? colorScheme.surfaceContainerLowest : bgLight;
+
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: seed,
-        brightness: brightness,
+      colorScheme: colorScheme.copyWith(
         primary: seed,
-        surface: isDark ? bgDark : bgLight,
-        // ADD THESE TWO LINES:
-        onSurface: isDark ? textDark : textLight,
-        onSurfaceVariant: isDark
-            ? textDark.withOpacity(0.7)
-            : textLight.withOpacity(0.7),
+        surface: isDark ? colorScheme.surfaceContainerLow : bgLight,
       ),
-      scaffoldBackgroundColor: isDark ? bgDark : bgLight,
+      scaffoldBackgroundColor: dynamicBg,
 
-      // Card Theme: No shadows, just subtle borders
+      // Card Theme: Tinted to match the background
       cardTheme: CardThemeData(
-        color: isDark ? cardDark : cardLight,
+        color: isDark ? colorScheme.surfaceContainer : cardLight,
         elevation: 0,
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
-            color: isDark ? Colors.white10 : Colors.black.withOpacity(0.05),
+            color: isDark
+                ? Colors.white.withOpacity(0.05)
+                : Colors.black.withOpacity(0.05),
           ),
         ),
       ),
 
-      // AppBar: Transparent and clean
+      // Input Decoration: Keep it consistent
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: isDark ? colorScheme.surfaceContainerHigh : Colors.white,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
+        ),
+      ),
+
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -64,20 +79,6 @@ class AppTheme extends ChangeNotifier {
           color: isDark ? textDark : textLight,
           fontSize: 24,
           fontWeight: FontWeight.bold,
-        ),
-      ),
-
-      // Input Decoration: Compatible with both modes
-      inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: isDark ? cardDark : Colors.white,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
         ),
       ),
     );
