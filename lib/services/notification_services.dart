@@ -15,13 +15,9 @@ class NotificationService {
   Future<void> init() async {
     // 1. Initialize timezone database
     tz.initializeTimeZones();
-
-    // FIX #1: getLocalTimezone() is async — must be awaited.
-    // Previously: FlutterTimezone.getLocalTimezone().toString()
-    // That gave "Instance of 'Future<String>'" instead of the real timezone name,
-    // causing tz.getLocation() to throw a LocationNotFoundException at runtime.
     final TimezoneInfo tzObject = await FlutterTimezone.getLocalTimezone();
     final String tzName = tzObject.identifier;
+
     // 3. Set local timezone
     tz.setLocalLocation(tz.getLocation(tzName));
 
@@ -42,9 +38,6 @@ class NotificationService {
       iOS: iosSettings,
     );
 
-    // FIX #2: In flutter_local_notifications v17+, the first argument to
-    // initialize() is positional, not named. Using `settings:` as a named
-    // parameter compiles in older versions but fails or is ignored in v21.
     await _plugin.initialize(
       settings: settings,
       onDidReceiveNotificationResponse: (details) {
@@ -101,8 +94,6 @@ class NotificationService {
       body: 'AssignMate notifications are working on your device.',
       scheduledDate:
           tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
-      // FIX #3: iOS DarwinNotificationDetails was missing here.
-      // Without it the notification is silently dropped on iOS.
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           'test_channel',
@@ -118,8 +109,6 @@ class NotificationService {
   }
 
   Future<void> cancelNotification(String id) async {
-    // FIX #4: The cancel call was commented out, making this a no-op.
-    // Restored so that per-assignment notification cancellation works correctly.
     await _plugin.cancel(id: id.hashCode);
   }
 
