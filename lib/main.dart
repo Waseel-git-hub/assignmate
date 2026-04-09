@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:assignmate/services/apptheme.dart';
 import 'models/assignment.dart';
+import 'package:assignmate/services/notification_services.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 
@@ -13,7 +14,7 @@ void main() async {
   //  Initialize Hive for Flutter
   await Hive.initFlutter();
 
-  //await NotificationService().init();
+  await NotificationService().init();
 
   // 2. Register the Assignment blueprint so Hive knows how to handle it
   Hive.registerAdapter(AssignmentAdapter());

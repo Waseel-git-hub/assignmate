@@ -3,6 +3,7 @@ import 'package:assignmate/main.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:assignmate/services/apptheme.dart';
+import 'package:assignmate/services/notification_services.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -126,17 +127,23 @@ class SettingsScreen extends StatelessWidget {
           _buildSectionHeader("Notifications"),
 
           ListTile(
-            leading: const Icon(Icons.notification_important_outlined),
-            title: const Text("Send Test Notification"),
-            subtitle: const Text("Alert in 5 seconds"),
+            leading: const Icon(Icons.notification_important_rounded,
+                color: Colors.orange),
+            title: const Text("Test Notifications"),
+            subtitle: const Text("Receive a test alert in 5 seconds"),
             onTap: () async {
-              // Calling with explicit named arguments
-              /* await NotificationService().scheduleNotification(
-                id: 1,
-                title: "AssignMate Test",
-                body: "Notifications are now active! 🚀",
-                scheduledTime: DateTime.now().add(const Duration(seconds: 5)),
-              );*/
+              await NotificationService().showInstantTestNotification();
+
+              // Show a snackbar so you know the timer started
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                        "Test scheduled! Lock your phone or wait 5 seconds..."),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
             },
           ),
 

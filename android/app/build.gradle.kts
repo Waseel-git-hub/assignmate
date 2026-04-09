@@ -45,6 +45,5 @@ flutter {
 }
 
 dependencies {
-    // Use parentheses and NO equals sign
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }
