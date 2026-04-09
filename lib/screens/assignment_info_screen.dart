@@ -115,7 +115,24 @@ class AssignmentInfoScreen extends StatelessWidget {
                 color: isDark
                     ? Theme.of(context).cardTheme.color
                     : Theme.of(context).cardTheme.color,
+                border: Border.all(
+                  color: isDark
+                      ? Colors.white.withOpacity(0.08)
+                      : Theme.of(context)
+                          .colorScheme
+                          .outlineVariant
+                          .withOpacity(0.5),
+                ),
                 borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: isDark
+                        ? Colors.transparent
+                        : Colors.black.withOpacity(0.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
               ),
               child: Text(
                 assignment.description.isEmpty

@@ -42,10 +42,8 @@ class AppTheme extends ChangeNotifier {
       brightness: brightness,
     );
 
-    // 2. ADJUST BACKGROUND LIGHTNESS HERE
-    // surfaceContainerLow or surfaceContainer will be lighter than surfaceContainerLowest
     final Color lightBgTinted = Color.alphaBlend(
-      seed.withOpacity(0.08),
+      seed.withOpacity(0.03),
       Colors.white,
     );
     final Color dynamicBg = isDark
