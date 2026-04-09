@@ -65,24 +65,25 @@ class AssignmentCard extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
-        // Change background color when selected
         color: isSelected
-            ? theme.colorScheme.primaryContainer.withOpacity(isDark ? 0.5 : 0.9)
-            : (isDark
-                ? theme.colorScheme
-                    .surfaceContainerHigh // Matches the tinted dark bg
-                : theme.colorScheme.surface), // Matches the light bg
+            ? theme.colorScheme.primaryContainer.withOpacity(isDark ? 0.5 : 0.3)
+            : theme.cardTheme.color,
         borderRadius: BorderRadius.circular(24),
-        // Add a border when selected
         border: Border.all(
-          color: isSelected ? theme.colorScheme.primary : Colors.transparent,
-          width: 2,
+          // Give it a subtle border even when NOT selected in light mode
+          color: isSelected
+              ? theme.colorScheme.primary
+              : (isDark
+                  ? Colors.transparent
+                  : theme.colorScheme.outlineVariant.withOpacity(0.5)),
+          width: 1, // Thinner border looks more premium
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            // Increase opacity from 0.03 to 0.08 for light mode
+            color: isDark ? Colors.transparent : Colors.black.withOpacity(0.08),
             blurRadius: 20,
-            offset: const Offset(0, 8),
+            offset: const Offset(0, 10), // Move shadow down to look 'higher'
           ),
         ],
       ),
@@ -117,16 +118,16 @@ class AssignmentCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              color: (Colors.blueGrey).withOpacity(0.1),
+                              // Use the primary color from the theme for the box background
+                              color: theme.colorScheme.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Icon(
                               isSelected
                                   ? Icons.check_circle
                                   : Icons.assignment_outlined,
-                              color: isSelected
-                                  ? theme.colorScheme.primary
-                                  : Colors.blueGrey,
+                              color: theme
+                                  .colorScheme.primary, // Use theme primary
                               size: 24,
                             ),
                           ),

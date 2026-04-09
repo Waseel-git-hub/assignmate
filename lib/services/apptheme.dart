@@ -19,8 +19,6 @@ class AppTheme extends ChangeNotifier {
   static const Color textLight = Color(0xFF1E293B);
 
   // DARK PALETTE
-  static const Color bgDark = Color(0xFF0F172A);
-  static const Color cardDark = Color(0xFF1E293B);
   static const Color textDark = Color(0xFFF1F5F9);
 
   static ThemeData _base(Brightness brightness, Color seed) {
@@ -36,7 +34,7 @@ class AppTheme extends ChangeNotifier {
     // surfaceContainerLow or surfaceContainer will be lighter than surfaceContainerLowest
     final Color dynamicBg = isDark
         ? colorScheme.surfaceContainerLow // This adds more "tint" and lightness
-        : bgLight;
+        : colorScheme.surfaceContainerLow;
 
     return ThemeData(
       useMaterial3: true,
