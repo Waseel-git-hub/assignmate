@@ -14,7 +14,6 @@ class AppTheme extends ChangeNotifier {
   }
 
   // LIGHT PALETTE
-  static const Color bgLight = Color(0xFFF8FAFC);
   static const Color cardLight = Colors.white;
   static const Color textLight = Color(0xFF1E293B);
 
@@ -32,9 +31,13 @@ class AppTheme extends ChangeNotifier {
 
     // 2. ADJUST BACKGROUND LIGHTNESS HERE
     // surfaceContainerLow or surfaceContainer will be lighter than surfaceContainerLowest
+    final Color lightBgTinted = Color.alphaBlend(
+      seed.withOpacity(0.08),
+      Colors.white,
+    );
     final Color dynamicBg = isDark
         ? colorScheme.surfaceContainerLow // This adds more "tint" and lightness
-        : colorScheme.surfaceContainerLow;
+        : lightBgTinted;
 
     return ThemeData(
       useMaterial3: true,
@@ -42,7 +45,7 @@ class AppTheme extends ChangeNotifier {
       colorScheme: colorScheme.copyWith(
         primary: seed,
         // Make sure surfaces are slightly lighter than the background for contrast
-        surface: isDark ? colorScheme.surfaceContainer : bgLight,
+        surface: isDark ? colorScheme.surfaceContainer : lightBgTinted,
         onSurface: isDark ? textDark : textLight,
       ),
       scaffoldBackgroundColor: dynamicBg,

@@ -43,7 +43,11 @@ class AssignmentInfoScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
+                    // Use primaryContainer for a better themed background behind the icon
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primaryContainer
+                        .withOpacity(0.4),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Icon(
@@ -107,14 +111,21 @@ class AssignmentInfoScreen extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: isDark ? Colors.white10 : Colors.grey[100],
+                // Use tinted container colors instead of hardcoded grays
+                color: isDark
+                    ? Theme.of(context).cardTheme.color
+                    : Theme.of(context).cardTheme.color,
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Text(
                 assignment.description.isEmpty
                     ? "No description provided."
                     : assignment.description,
-                style: const TextStyle(fontSize: 15, height: 1.5),
+                style: TextStyle(
+                  fontSize: 15,
+                  height: 1.5,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
               ),
             ),
           ],
@@ -130,12 +141,30 @@ class AssignmentInfoScreen extends StatelessWidget {
     IconData icon,
     Color color,
   ) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.withOpacity(0.2)),
+          // Use the theme's card color instead of Theme.of(context).cardColor
+          color: theme.cardTheme.color,
+          // Match the border style from your AssignmentCard
+          border: Border.all(
+            color: isDark
+                ? Colors.white.withOpacity(0.08)
+                : theme.colorScheme.outlineVariant.withOpacity(0.5),
+          ),
           borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color:
+                  isDark ? Colors.transparent : Colors.black.withOpacity(0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,11 +173,18 @@ class AssignmentInfoScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               label,
-              style: const TextStyle(color: Colors.grey, fontSize: 12),
+              style: TextStyle(
+                color: theme.colorScheme.onSurfaceVariant, // Better contrast
+                fontSize: 12,
+              ),
             ),
             Text(
               value,
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+                color: theme.colorScheme.onSurface,
+              ),
             ),
           ],
         ),
