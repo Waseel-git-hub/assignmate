@@ -3,7 +3,6 @@ import 'package:assignmate/main.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:assignmate/services/apptheme.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -125,23 +124,6 @@ class SettingsScreen extends StatelessWidget {
           const Divider(),
           // Inside your SettingsScreen ListView
           _buildSectionHeader("Notifications"),
-
-          ListTile(
-            leading: const Icon(Icons.notifications_active_outlined),
-            title: const Text("Enable Reminders"),
-            trailing: Switch(
-              value: true,
-              onChanged: (bool value) async {
-                if (value) {
-                  final plugin = FlutterLocalNotificationsPlugin();
-                  await plugin
-                      .resolvePlatformSpecificImplementation<
-                          AndroidFlutterLocalNotificationsPlugin>()
-                      ?.requestNotificationsPermission();
-                }
-              },
-            ),
-          ),
 
           ListTile(
             leading: const Icon(Icons.notification_important_outlined),
