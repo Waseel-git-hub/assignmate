@@ -67,8 +67,11 @@ class AssignmentCard extends StatelessWidget {
       decoration: BoxDecoration(
         // Change background color when selected
         color: isSelected
-            ? theme.colorScheme.primaryContainer.withOpacity(isDark ? 0.3 : 0.7)
-            : (isDark ? const Color(0xFF1E293B) : Colors.white),
+            ? theme.colorScheme.primaryContainer.withOpacity(isDark ? 0.5 : 0.9)
+            : (isDark
+                ? theme.colorScheme
+                    .surfaceContainerHigh // Matches the tinted dark bg
+                : theme.colorScheme.surface), // Matches the light bg
         borderRadius: BorderRadius.circular(24),
         // Add a border when selected
         border: Border.all(
@@ -162,7 +165,7 @@ class AssignmentCard extends StatelessWidget {
                                       DateFormat('dd MMM yyyy').format(
                                         submitted
                                             ? (assignment.submittedAt ??
-                                                  DateTime.now())
+                                                DateTime.now())
                                             : assignment.deadline,
                                       ),
                                       style: const TextStyle(
@@ -215,7 +218,6 @@ class AssignmentCard extends StatelessWidget {
                       ),
                       if (showExpandableButton || showRightButton)
                         const SizedBox(height: 20),
-
                       if (showExpandableButton || showRightButton)
                         Row(
                           children: [

@@ -26,53 +26,53 @@ class AppTheme extends ChangeNotifier {
   static ThemeData _base(Brightness brightness, Color seed) {
     bool isDark = brightness == Brightness.dark;
 
-    // This is the magic part: Generate the color scheme first
+    // 1. Generate the color scheme
     final colorScheme = ColorScheme.fromSeed(
       seedColor: seed,
       brightness: brightness,
     );
 
-    // Use the generated 'surfaceContainerLowest' for the deep background feel
-    // or 'surface' for a slightly lighter tinted background.
-    final Color dynamicBg =
-        isDark ? colorScheme.surfaceContainerLowest : bgLight;
+    // 2. ADJUST BACKGROUND LIGHTNESS HERE
+    // surfaceContainerLow or surfaceContainer will be lighter than surfaceContainerLowest
+    final Color dynamicBg = isDark
+        ? colorScheme.surfaceContainerLow // This adds more "tint" and lightness
+        : bgLight;
 
     return ThemeData(
       useMaterial3: true,
       brightness: brightness,
       colorScheme: colorScheme.copyWith(
         primary: seed,
-        surface: isDark ? colorScheme.surfaceContainerLow : bgLight,
+        // Make sure surfaces are slightly lighter than the background for contrast
+        surface: isDark ? colorScheme.surfaceContainer : bgLight,
+        onSurface: isDark ? textDark : textLight,
       ),
       scaffoldBackgroundColor: dynamicBg,
-
-      // Card Theme: Tinted to match the background
       cardTheme: CardThemeData(
-        color: isDark ? colorScheme.surfaceContainer : cardLight,
+        // Cards should be the 'High' or 'Highest' container to pop against the bg
+        color: isDark ? colorScheme.surfaceContainerHigh : cardLight,
         elevation: 0,
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
           side: BorderSide(
             color: isDark
-                ? Colors.white.withOpacity(0.05)
+                ? Colors.white.withOpacity(0.08)
                 : Colors.black.withOpacity(0.05),
           ),
         ),
       ),
-
-      // Input Decoration: Keep it consistent
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: isDark ? colorScheme.surfaceContainerHigh : Colors.white,
+        // Input fields look best when slightly darker or lighter than the card
+        fillColor: isDark ? colorScheme.surfaceContainerHighest : Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
       ),
-
       appBarTheme: AppBarTheme(
-        backgroundColor: Colors.transparent,
+        backgroundColor: dynamicBg, // Match the scaffold for a seamless look
         elevation: 0,
         centerTitle: false,
         titleTextStyle: TextStyle(
