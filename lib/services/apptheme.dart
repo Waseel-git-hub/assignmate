@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 
 class AppTheme extends ChangeNotifier {
   static final AppTheme _instance = AppTheme._internal();
@@ -7,6 +8,18 @@ class AppTheme extends ChangeNotifier {
 
   Color _appAccentColor = const Color(0xFF6366F1);
   Color get appAccentColor => _appAccentColor;
+
+  void init() {
+    try {
+      var box = Hive.box('settingsBox');
+      int? savedColor = box.get('accentColor');
+      if (savedColor != null) {
+        _appAccentColor = Color(savedColor);
+      }
+    } catch (e) {
+      debugPrint("Theme Init Error: $e");
+    }
+  }
 
   void updateAccentColor(Color newColor) {
     _appAccentColor = newColor;

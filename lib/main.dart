@@ -20,12 +20,12 @@ void main() async {
 
   await Hive.openBox<Assignment>('assignmentsBox');
   final settingsBox = await Hive.openBox('settingsBox');
-  // Load the saved theme index
   final int savedThemeIndex = settingsBox.get(
     'themeMode',
     defaultValue: ThemeMode.system.index,
   );
   themeNotifier.value = ThemeMode.values[savedThemeIndex];
+  AppTheme().init();
 
   runApp(const AssignmentsApp());
 }
