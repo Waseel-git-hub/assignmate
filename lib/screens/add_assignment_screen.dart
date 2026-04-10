@@ -110,7 +110,7 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
       );
       await box.put(activeAssignment.id, activeAssignment); // Assign here
     }
-
+    await NotificationService().cancelNotification(activeAssignment.id);
     // Only schedule if reminder exists and is in the future
     if (_reminderDate != null && _reminderDate!.isAfter(DateTime.now())) {
       await NotificationService().scheduleAssignmentReminder(
