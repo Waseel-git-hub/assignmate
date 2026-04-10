@@ -54,21 +54,25 @@ class NotificationService {
     }
   }
 
-  /// Schedules a reminder 24 hours before the assignment deadline.
+  //// Schedule for reminder notification
   Future<void> scheduleAssignmentReminder({
     required String id,
     required String title,
+    required String subject,
+    required DateTime reminder,
     required DateTime deadline,
   }) async {
-    final scheduleDate = deadline.subtract(const Duration(days: 1));
-
-    // Safety: don't schedule in the past
+    final scheduleDate = reminder;
     if (scheduleDate.isBefore(DateTime.now())) return;
+    final daysLeft = deadline.difference(reminder).inDays;
+    String timePhrase = daysLeft == 1 ? "tomorrow" : "in $daysLeft days";
+    if (daysLeft == 0) timePhrase = "today";
 
     await _plugin.zonedSchedule(
       id: id.hashCode,
-      title: 'Assignment Due Soon!',
-      body: 'Your assignment "$title" is due tomorrow.',
+      title: 'Assignment Reminder: $subject',
+      // Now the body matches the custom reminder time
+      body: 'Your assignment "$title" is due $timePhrase.',
       scheduledDate: tz.TZDateTime.from(scheduleDate, tz.local),
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
