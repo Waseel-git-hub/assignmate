@@ -21,31 +21,37 @@ class _NavigationMenuState extends State<NavigationMenu> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      // 3. The body changes automatically based on the index
-      body: _screens[_selectedIndex],
-
-      // 4. The Bottom Bar
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Theme.of(context).colorScheme.primary,
-        currentIndex: _selectedIndex, // Tells the bar which icon to highlight
-        onTap: (index) {
-          // 5. When a user taps a tab, we update the index and REBUILD
-          setState(() {
-            _selectedIndex = index;
-          });
+    return PopScope(
+        canPop: _selectedIndex == 0, // Only allow exit if on Home tab
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) return;
+          if (_selectedIndex != 0) {
+            setState(() {
+              _selectedIndex = 0; // Switch to Home tab
+            });
+          }
         },
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home_rounded),
-            label: 'Home',
+        child: Scaffold(
+          body: _screens[_selectedIndex],
+          bottomNavigationBar: BottomNavigationBar(
+            selectedItemColor: Theme.of(context).colorScheme.primary,
+            currentIndex: _selectedIndex,
+            onTap: (index) {
+              setState(() {
+                _selectedIndex = index;
+              });
+            },
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_rounded),
+                label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.settings_rounded),
+                label: 'Settings',
+              ),
+            ],
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.settings_rounded),
-            label: 'Settings',
-          ),
-        ],
-      ),
-    );
+        ));
   }
 }

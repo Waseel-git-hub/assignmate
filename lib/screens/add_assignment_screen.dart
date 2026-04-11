@@ -161,7 +161,7 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
             onPressed: _saveAssignment,
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
+              foregroundColor: Colors.white,
               padding: const EdgeInsets.all(16),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
