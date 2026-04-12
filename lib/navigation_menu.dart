@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart'; // Import your Home Screen
 import 'screens/settings_screen.dart'; // Import your Settings Screen
+import 'screens/subject_screen.dart';
 
 class NavigationMenu extends StatefulWidget {
   const NavigationMenu({super.key});
@@ -16,7 +17,8 @@ class _NavigationMenuState extends State<NavigationMenu> {
   // 2. This list holds the actual screens
   final List<Widget> _screens = [
     const HomeScreen(), // Index 0
-    const SettingsScreen(), // Index 1
+    const SubjectScreen(), // Index 1
+    const SettingsScreen(), // Index 2
   ];
 
   @override
@@ -45,6 +47,10 @@ class _NavigationMenuState extends State<NavigationMenu> {
               BottomNavigationBarItem(
                 icon: Icon(Icons.home_rounded),
                 label: 'Home',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.auto_stories_rounded), // Book/Subject icon
+                label: 'Subjects',
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.settings_rounded),

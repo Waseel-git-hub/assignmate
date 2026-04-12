@@ -1,3 +1,4 @@
+import 'package:assignmate/models/subject.dart';
 import 'package:assignmate/navigation_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
@@ -7,18 +8,16 @@ import 'models/assignment.dart';
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 
 void main() async {
-  // Ensure Flutter is ready for native calls (Like Hive)
   WidgetsFlutterBinding.ensureInitialized();
-
-  //  Initialize Hive for Flutter
+  // Initialize Hive
   await Hive.initFlutter();
-
-  //await NotificationService().init();
-
-  // 2. Register the Assignment blueprint so Hive knows how to handle it
+  // Register the Blueprint so Hive knows how to handle it
   Hive.registerAdapter(AssignmentAdapter());
-
+  Hive.registerAdapter(SubjectAdapter());
+  // Open Boxes
   await Hive.openBox<Assignment>('assignmentsBox');
+  await Hive.openBox<Subject>('subjectsBox');
+
   final settingsBox = await Hive.openBox('settingsBox');
   final int savedThemeIndex = settingsBox.get(
     'themeMode',
@@ -37,7 +36,7 @@ class AssignmentsApp extends StatelessWidget {
   Widget build(BuildContext context) {
     // ValueListenableBuilder "rebuilds" the app whenever themeNotifier changes
     return ListenableBuilder(
-      listenable: AppTheme(), // Access the singleton instance
+      listenable: AppTheme(),
       builder: (context, _) {
         return ValueListenableBuilder<ThemeMode>(
           valueListenable: themeNotifier,

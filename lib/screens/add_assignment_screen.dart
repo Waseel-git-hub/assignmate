@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import '../models/assignment.dart';
-import 'package:hive/hive.dart';
+import '../models/subject.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'add_subject_screen.dart';
 
 class AddAssignmentScreen extends StatefulWidget {
   final Assignment? assignment;
@@ -26,6 +28,7 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
     'CORRECTED',
   ];
   late String _currentStatus;
+  late Box<Subject> _subjectBox;
 
   @override
   void dispose() {
@@ -38,6 +41,7 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
   @override
   void initState() {
     super.initState();
+    _subjectBox = Hive.box<Subject>('subjectsBox');
     _titleController = TextEditingController(
       text: widget.assignment?.title ?? "",
     );
@@ -96,15 +100,48 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
             decoration: const InputDecoration(labelText: "Title"),
           ),
           const SizedBox(height: 16),
-          TextField(
-            focusNode: _subjectFocus, // Tell this field it's the 'Subject' node
-            textInputAction: TextInputAction.next,
-            onSubmitted: (_) {
-              // When 'Next' is pressed, jump to Description
-              FocusScope.of(context).requestFocus(_descriptionFocus);
+          // In add_assignment_screen.dart
+          ValueListenableBuilder(
+            valueListenable: Hive.box<Subject>('subjectsBox').listenable(),
+            builder: (context, Box<Subject> box, _) {
+              final subjects = box.values.toList();
+
+              return DropdownButtonFormField<String>(
+                // Still store the name in the assignment subject field
+                value: subjects.any((s) => s.name == _subjectController.text)
+                    ? _subjectController.text
+                    : null,
+                items: [
+                  ...subjects.map((sub) => DropdownMenuItem(
+                        value: sub.name,
+                        child: Row(
+                          children: [
+                            Icon(IconData(sub.iconCodePoint,
+                                fontFamily: 'MaterialIcons')),
+                            const SizedBox(width: 10),
+                            Text(sub.name),
+                          ],
+                        ),
+                      )),
+                  const DropdownMenuItem(
+                    value: "ADD_NEW",
+                    child: Text("+ Add New Subject",
+                        style: TextStyle(color: Colors.blue)),
+                  )
+                ],
+                onChanged: (val) {
+                  if (val == "ADD_NEW") {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const AddSubjectScreen()),
+                    );
+                  } else {
+                    _subjectController.text = val!;
+                  }
+                },
+              );
             },
-            controller: _subjectController,
-            decoration: const InputDecoration(labelText: "Subject"),
           ),
           const SizedBox(height: 16),
           TextField(

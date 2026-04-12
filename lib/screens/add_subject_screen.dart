@@ -1,0 +1,161 @@
+import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
+import '../models/subject.dart';
+
+class AddSubjectScreen extends StatefulWidget {
+  final Subject? subject; // If null, we are creating. If not, we are editing.
+
+  const AddSubjectScreen({super.key, this.subject});
+
+  @override
+  State<AddSubjectScreen> createState() => _AddSubjectScreenState();
+}
+
+class _AddSubjectScreenState extends State<AddSubjectScreen> {
+  late TextEditingController _nameController;
+  late int _selectedIcon;
+  late int _selectedColor;
+
+  final List<IconData> _iconOptions = [
+    Icons.book,
+    Icons.science,
+    Icons.calculate,
+    Icons.history,
+    Icons.palette,
+    Icons.code,
+    Icons.fitness_center,
+    Icons.music_note
+  ];
+
+  final List<Color> _colorOptions = [
+    Colors.blue,
+    Colors.red,
+    Colors.green,
+    Colors.orange,
+    Colors.purple,
+    Colors.teal,
+    Colors.pink,
+    Colors.amber
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with existing data if editing, or defaults if creating
+    _nameController = TextEditingController(text: widget.subject?.name ?? "");
+    _selectedIcon = widget.subject?.iconCodePoint ?? Icons.book.codePoint;
+    _selectedColor = widget.subject?.colorValue ?? Colors.blue.value;
+  }
+
+  void _saveSubject() async {
+    // 1. Basic Validation
+    if (_nameController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please enter a subject name")),
+      );
+      return;
+    }
+
+    try {
+      final box = Hive.box<Subject>('subjectsBox');
+
+      if (widget.subject != null) {
+        // EDIT MODE
+        widget.subject!.name = _nameController.text.trim();
+        widget.subject!.iconCodePoint = _selectedIcon;
+        widget.subject!.colorValue = _selectedColor;
+        await widget.subject!.save();
+      } else {
+        // CREATE MODE
+        final newSub = Subject(
+          name: _nameController.text.trim(),
+          iconCodePoint: _selectedIcon,
+          colorValue: _selectedColor,
+        );
+        await box.add(newSub);
+      }
+      if (!mounted) return;
+      Navigator.of(context).pop();
+    } catch (e) {
+      debugPrint("Error saving subject: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to save: $e")),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.subject != null ? "Edit Subject" : "New Subject"),
+      ),
+      body: ListView(
+        padding: const EdgeInsets.all(24),
+        children: [
+          TextField(
+            controller: _nameController,
+            decoration: const InputDecoration(
+              labelText: "Subject Name",
+              border: OutlineInputBorder(),
+            ),
+          ),
+          const SizedBox(height: 30),
+          const Text("Select Icon",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 10,
+            children: _iconOptions.map((icon) {
+              final isSelected = _selectedIcon == icon.codePoint;
+              return IconButton(
+                onPressed: () => setState(() => _selectedIcon = icon.codePoint),
+                icon: Icon(icon),
+                color: isSelected ? Color(_selectedColor) : Colors.grey,
+                style: IconButton.styleFrom(
+                  backgroundColor: isSelected
+                      ? Color(_selectedColor).withOpacity(0.1)
+                      : null,
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 30),
+          const Text("Select Color",
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 15,
+            children: _colorOptions.map((color) {
+              final isSelected = _selectedColor == color.value;
+              return GestureDetector(
+                onTap: () => setState(() => _selectedColor = color.value),
+                child: CircleAvatar(
+                  backgroundColor: color,
+                  radius: 18,
+                  child: isSelected
+                      ? const Icon(Icons.check, color: Colors.white)
+                      : null,
+                ),
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 50),
+          ElevatedButton(
+            onPressed: () {
+              _saveSubject();
+            },
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.all(16),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(widget.subject != null ? "Update" : "Create"),
+          ),
+        ],
+      ),
+    );
+  }
+}
