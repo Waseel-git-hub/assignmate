@@ -28,8 +28,6 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
     'CORRECTED',
   ];
   late String _currentStatus;
-  late Box<Subject> _subjectBox;
-
   @override
   void dispose() {
     // Crucial: Clean them up when the screen closes
@@ -41,7 +39,6 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
   @override
   void initState() {
     super.initState();
-    _subjectBox = Hive.box<Subject>('subjectsBox');
     _titleController = TextEditingController(
       text: widget.assignment?.title ?? "",
     );
