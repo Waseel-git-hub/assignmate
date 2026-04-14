@@ -12,7 +12,7 @@ class Assignment extends HiveObject {
   String title;
 
   @HiveField(2)
-  String subject;
+  dynamic subjectId;
 
   @HiveField(3)
   String description;
@@ -29,7 +29,7 @@ class Assignment extends HiveObject {
   Assignment({
     required this.id,
     required this.title,
-    required this.subject,
+    required this.subjectId,
     this.description = "",
     required this.deadline,
     this.status = 'PENDING',

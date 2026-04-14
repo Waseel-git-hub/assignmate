@@ -2,7 +2,9 @@ import 'package:assignmate/screens/add_assignment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../models/assignment.dart';
+import 'package:assignmate/models/subject.dart';
 import '../widgets/status_helper.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class AssignmentCard extends StatelessWidget {
   final Assignment assignment;
@@ -61,6 +63,15 @@ class AssignmentCard extends StatelessWidget {
       assignment.deadline,
       assignment.status,
     );
+    final subjectBox = Hive.box<Subject>('subjectsBox');
+    final subject = subjectBox.get(assignment.subjectId);
+
+    // 2. Get the name (with a fallback if the subject was deleted)
+    final String subjectName = subject?.name ?? "Unknown Subject";
+    final Color subjectColor =
+        subject != null ? Color(subject.colorValue) : theme.colorScheme.primary;
+    final int subjectIcon = subject?.iconCodePoint ?? Icons.book.codePoint;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -125,9 +136,9 @@ class AssignmentCard extends StatelessWidget {
                             child: Icon(
                               isSelected
                                   ? Icons.check_circle
-                                  : Icons.assignment_outlined,
-                              color: theme
-                                  .colorScheme.primary, // Use theme primary
+                                  : IconData(subjectIcon,
+                                      fontFamily: 'MaterialIcons'),
+                              color: subjectColor,
                               size: 24,
                             ),
                           ),
@@ -147,7 +158,7 @@ class AssignmentCard extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  assignment.subject,
+                                  subjectName,
                                   style: const TextStyle(
                                     color: Colors.grey,
                                     fontSize: 13,

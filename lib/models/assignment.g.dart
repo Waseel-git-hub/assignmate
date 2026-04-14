@@ -19,7 +19,7 @@ class AssignmentAdapter extends TypeAdapter<Assignment> {
     return Assignment(
       id: fields[0] as String,
       title: fields[1] as String,
-      subject: fields[2] as String,
+      subjectId: fields[2] as dynamic,
       description: fields[3] as String,
       deadline: fields[4] as DateTime,
       status: fields[5] as String,
@@ -36,7 +36,7 @@ class AssignmentAdapter extends TypeAdapter<Assignment> {
       ..writeByte(1)
       ..write(obj.title)
       ..writeByte(2)
-      ..write(obj.subject)
+      ..write(obj.subjectId)
       ..writeByte(3)
       ..write(obj.description)
       ..writeByte(4)

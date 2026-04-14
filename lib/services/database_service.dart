@@ -17,7 +17,7 @@ class DatabaseService {
 
   List<Assignment> getAssignments({
     String completionStatus = 'All', // e.g. 'PENDING', 'COMPLETED'
-    String subject = 'All', // e.g. 'Math', 'Science'
+    dynamic subjectId = 'All', // e.g. 'Math', 'Science'
   }) {
     final box = Hive.box<Assignment>(_boxName);
     // 1. Start with the full list
@@ -26,7 +26,8 @@ class DatabaseService {
     List<Assignment> filteredList = assignments.where((task) {
       bool matchesStatus =
           (completionStatus == "All") || (task.status == completionStatus);
-      bool matchesSubject = (subject == "All") || (task.subject == subject);
+      bool matchesSubject =
+          (subjectId == "All") || (task.subjectId == subjectId);
       return matchesStatus && matchesSubject;
     }).toList();
     filteredList.sort((a, b) => a.deadline.compareTo(b.deadline));

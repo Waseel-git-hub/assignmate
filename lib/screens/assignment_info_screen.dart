@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import '../models/assignment.dart';
 import '../widgets/status_helper.dart';
 import 'add_assignment_screen.dart';
+import 'package:assignmate/models/subject.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 class AssignmentInfoScreen extends StatelessWidget {
   final Assignment assignment;
@@ -40,6 +42,8 @@ class AssignmentInfoScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final primaryColor = Theme.of(context).colorScheme.primary;
+    final subject = Hive.box<Subject>('subjectsBox').get(assignment.subjectId);
+    final String displaySubject = subject?.name ?? "No Subject";
 
     return Scaffold(
         appBar: AppBar(
@@ -82,7 +86,7 @@ class AssignmentInfoScreen extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          assignment.subject,
+                          displaySubject,
                           style:
                               TextStyle(fontSize: 16, color: Colors.grey[600]),
                         ),

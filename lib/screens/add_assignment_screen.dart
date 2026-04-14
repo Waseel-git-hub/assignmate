@@ -18,7 +18,6 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
   final FocusNode _subjectFocus = FocusNode();
   final FocusNode _descriptionFocus = FocusNode();
   late TextEditingController _titleController;
-  late TextEditingController _subjectController;
   late TextEditingController _descController;
   late DateTime _selectedDate;
   final List<String> _statusOptions = [
@@ -28,9 +27,10 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
     'CORRECTED',
   ];
   late String _currentStatus;
+  dynamic _selectedSubjectId;
+
   @override
   void dispose() {
-    // Crucial: Clean them up when the screen closes
     _subjectFocus.dispose();
     _descriptionFocus.dispose();
     super.dispose();
@@ -41,9 +41,6 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
     super.initState();
     _titleController = TextEditingController(
       text: widget.assignment?.title ?? "",
-    );
-    _subjectController = TextEditingController(
-      text: widget.assignment?.subject ?? "",
     );
     _descController = TextEditingController(
       text: widget.assignment?.description ?? "",
@@ -57,7 +54,7 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
     final box = Hive.box<Assignment>('assignmentsBox');
     if (widget.assignment != null) {
       widget.assignment!.title = _titleController.text;
-      widget.assignment!.subject = _subjectController.text;
+      widget.assignment!.subjectId = _selectedSubjectId;
       widget.assignment!.description = _descController.text;
       widget.assignment!.deadline = _selectedDate;
       widget.assignment!.status = _currentStatus;
@@ -66,7 +63,7 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
       final newAsgn = Assignment(
         id: const Uuid().v4(),
         title: _titleController.text,
-        subject: _subjectController.text,
+        subjectId: _selectedSubjectId,
         description: _descController.text,
         deadline: _selectedDate,
         status: _currentStatus,
@@ -103,14 +100,12 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
             builder: (context, Box<Subject> box, _) {
               final subjects = box.values.toList();
 
-              return DropdownButtonFormField<String>(
+              return DropdownButtonFormField<dynamic>(
                 // Still store the name in the assignment subject field
-                value: subjects.any((s) => s.name == _subjectController.text)
-                    ? _subjectController.text
-                    : null,
+                value: _selectedSubjectId,
                 items: [
                   ...subjects.map((sub) => DropdownMenuItem(
-                        value: sub.name,
+                        value: sub.key,
                         child: Row(
                           children: [
                             Icon(IconData(sub.iconCodePoint,
@@ -134,7 +129,7 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
                           builder: (context) => const AddSubjectScreen()),
                     );
                   } else {
-                    _subjectController.text = val!;
+                    setState(() => _selectedSubjectId = val);
                   }
                 },
               );
@@ -192,7 +187,22 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
           ),
           const SizedBox(height: 40),
           ElevatedButton(
-            onPressed: _saveAssignment,
+            onPressed: () {
+              if (_titleController.text.trim().isEmpty) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Please enter a title")),
+                );
+                return;
+              }
+
+              if (_selectedSubjectId == null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Please select a subject")),
+                );
+                return;
+              }
+              _saveAssignment();
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: colorScheme.primary,
               foregroundColor: Colors.white,

@@ -85,8 +85,9 @@ class SubjectInfoScreen extends StatelessWidget {
                   Hive.box<Assignment>('assignmentsBox').listenable(),
               builder: (context, Box<Assignment> box, _) {
                 // Filter assignments by the current subject's name
-                final filteredList =
-                    box.values.where((a) => a.subject == subject.name).toList();
+                final filteredList = box.values
+                    .where((a) => a.subjectId == subject.key)
+                    .toList();
 
                 if (filteredList.isEmpty) {
                   return Center(
