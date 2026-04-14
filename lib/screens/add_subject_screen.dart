@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
-import '../models/subject.dart';
+//  MODELS
+import 'package:assignmate/models/subject.dart';
+//  SERVICES
+import 'package:assignmate/services/database_service.dart';
+//------------------------------------------------------------
 
 class AddSubjectScreen extends StatefulWidget {
   final Subject? subject; // If null, we are creating. If not, we are editing.
@@ -48,31 +51,28 @@ class _AddSubjectScreenState extends State<AddSubjectScreen> {
   }
 
   void _saveSubject() async {
-    // 1. Basic Validation
+    // Validation
     if (_nameController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Please enter a subject name")),
       );
       return;
     }
-
     try {
-      final box = Hive.box<Subject>('subjectsBox');
-
       if (widget.subject != null) {
         // EDIT MODE
         widget.subject!.name = _nameController.text.trim();
         widget.subject!.iconCodePoint = _selectedIcon;
         widget.subject!.colorValue = _selectedColor;
-        await widget.subject!.save();
+        await DatabaseService.saveSubject(widget.subject!);
       } else {
         // CREATE MODE
-        final newSub = Subject(
+        final newSubject = Subject(
           name: _nameController.text.trim(),
           iconCodePoint: _selectedIcon,
           colorValue: _selectedColor,
         );
-        await box.add(newSub);
+        await DatabaseService.saveSubject(newSubject);
       }
       if (!mounted) return;
       Navigator.of(context).pop();

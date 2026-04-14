@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/subject.dart';
+//  MODELS
+import 'package:assignmate/models/subject.dart';
+//------------------------------------------------------------
 
 class SubjectCard extends StatelessWidget {
   final Subject subject;

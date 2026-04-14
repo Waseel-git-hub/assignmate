@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
 
-// This line is needed for Hive to generate code for us later
 part 'assignment.g.dart';
 
 @HiveType(typeId: 0)

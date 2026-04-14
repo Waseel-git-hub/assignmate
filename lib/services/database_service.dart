@@ -1,28 +1,22 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import '../models/assignment.dart';
+//  MODELS
+import 'package:assignmate/models/assignment.dart';
+import 'package:assignmate/models/subject.dart';
+//--------------------------------------------------------------------
 
 class DatabaseService {
-  // We name the box the same as we did in main.dart
-  static const String _boxName = "assignmentsBox";
+  static const String _assignmentBoxName = "assignmentsBox";
+  static const String _subjectBoxName = "subjectsBox";
+  static final assignmentBox = Hive.box<Assignment>(_assignmentBoxName);
+  static final subjectBox = Hive.box<Subject>(_subjectBoxName);
 
-  // Get all assignments, sorted by deadline (as you requested!)
-  List<Assignment> getAllAssignments() {
-    final box = Hive.box<Assignment>(_boxName);
-    List<Assignment> assignments = box.values.toList();
+//---------------ASSIGNMENT-----------------------
 
-    // This sorts them so the closest deadline is at the top
-    assignments.sort((a, b) => a.deadline.compareTo(b.deadline));
-    return assignments;
-  }
-
-  List<Assignment> getAssignments({
-    String completionStatus = 'All', // e.g. 'PENDING', 'COMPLETED'
-    dynamic subjectId = 'All', // e.g. 'Math', 'Science'
+  static List<Assignment> getAssignments({
+    String completionStatus = 'All',
+    dynamic subjectId = 'All',
   }) {
-    final box = Hive.box<Assignment>(_boxName);
-    // 1. Start with the full list
-    List<Assignment> assignments = box.values.toList();
-    // 2. Apply filtering using .where()
+    List<Assignment> assignments = assignmentBox.values.toList();
     List<Assignment> filteredList = assignments.where((task) {
       bool matchesStatus =
           (completionStatus == "All") || (task.status == completionStatus);
@@ -34,20 +28,54 @@ class DatabaseService {
     return filteredList;
   }
 
-  // Add a new assignment
-  Future<void> addAssignment(Assignment assignment) async {
-    final box = Hive.box<Assignment>(_boxName);
-    await box.put(assignment.id, assignment);
+  static Assignment? getAssignmentById(dynamic id) {
+    if (id == null) return null;
+    return assignmentBox.get(id);
   }
 
-  // Update an existing assignment (status change, etc.)
-  Future<void> updateAssignment(Assignment assignment) async {
-    await assignment.save(); // Hive lets objects save themselves!
+  // Add or Update Assignment
+  static Future<void> saveAssignment(Assignment assignment) async {
+    if (assignment.isInBox) {
+      await assignment.save();
+    } else {
+      await assignmentBox.put(assignment.id, assignment);
+    }
   }
 
   // Delete an assignment
-  Future<void> deleteAssignment(String id) async {
-    final box = Hive.box<Assignment>(_boxName);
+  static Future<void> deleteAssignment(String id) async {
+    final box = Hive.box<Assignment>(_assignmentBoxName);
     await box.delete(id);
+  }
+
+//-------------------SUBJECT------------------------
+
+  // Add or Update Subject
+  static Future<void> saveSubject(Subject subject) async {
+    if (subject.isInBox) {
+      await subject.save();
+    } else {
+      // If it's new, we add it to the box
+      await subjectBox.add(subject);
+    }
+  }
+
+  // Get a specific subject by its ID (key)
+  static Subject? getSubjectById(dynamic id) {
+    if (id == null) return null;
+    return Hive.box<Subject>(_subjectBoxName).get(id);
+  }
+
+  // Delete Multiple Subjects and their associated assignments
+  static Future<void> deleteSubject(dynamic subjectId) async {
+    final sBox = Hive.box<Subject>(_subjectBoxName);
+    final aBox = Hive.box<Assignment>(_assignmentBoxName);
+    final linkedAssignments =
+        aBox.values.where((a) => a.subjectId == subjectId).toList();
+
+    for (var a in linkedAssignments) {
+      await a.delete(); // delete assignment
+    }
+    await sBox.delete(subjectId); // delete subject
   }
 }

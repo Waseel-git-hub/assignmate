@@ -1,10 +1,14 @@
-import 'package:assignmate/screens/add_assignment_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../models/assignment.dart';
-import 'package:assignmate/models/subject.dart';
-import '../widgets/status_helper.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+//  MODELS
+import 'package:assignmate/models/assignment.dart';
+//  SCREENS
+import 'package:assignmate/screens/add_assignment_screen.dart';
+//  WIDGETS
+import 'package:assignmate/widgets/status_helper.dart';
+//  SERVICES
+import 'package:assignmate/services/database_service.dart';
+//------------------------------------------------------------
 
 class AssignmentCard extends StatelessWidget {
   final Assignment assignment;
@@ -57,17 +61,13 @@ class AssignmentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final theme = Theme.of(context);
     final urgencyColor = _getUrgencyColor(
       assignment.deadline,
       assignment.status,
     );
-    final subjectBox = Hive.box<Subject>('subjectsBox');
-    final subject = subjectBox.get(assignment.subjectId);
-
-    // 2. Get the name (with a fallback if the subject was deleted)
-    final String subjectName = subject?.name ?? "Unknown Subject";
+    final subject = DatabaseService.subjectBox.get(assignment.subjectId);
+    final String subjectName = subject?.name ?? "Extra";
     final Color subjectColor =
         subject != null ? Color(subject.colorValue) : theme.colorScheme.primary;
     final int subjectIcon = subject?.iconCodePoint ?? Icons.book.codePoint;
@@ -77,36 +77,32 @@ class AssignmentCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
         color: isSelected
-            ? theme.colorScheme.primaryContainer.withOpacity(isDark ? 0.5 : 0.3)
+            ? theme.colorScheme.primaryContainer.withOpacity(0.7)
             : theme.cardTheme.color,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           // Give it a subtle border even when NOT selected in light mode
           color: isSelected
               ? theme.colorScheme.primary
-              : (isDark
-                  ? Colors.transparent
-                  : theme.colorScheme.outlineVariant.withOpacity(0.5)),
+              : theme.colorScheme.outlineVariant.withOpacity(0.5),
           width: 1, // Thinner border looks more premium
         ),
         boxShadow: [
           BoxShadow(
-            // Increase opacity from 0.03 to 0.08 for light mode
-            color: isDark ? Colors.transparent : Colors.black.withOpacity(0.08),
+            color: Colors.black.withOpacity(0.08),
             blurRadius: 20,
             offset: const Offset(0, 10), // Move shadow down to look 'higher'
           ),
         ],
       ),
       child: InkWell(
-        // Using InkWell for better touch feedback
         borderRadius: BorderRadius.circular(24),
         onTap: onTap,
         onLongPress: onLongPress,
         child: IntrinsicHeight(
           child: Row(
             children: [
-              // Your original Urgency Bar
+              // Urgency Bar
               Container(
                 width: 5,
                 decoration: BoxDecoration(
@@ -129,8 +125,9 @@ class AssignmentCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(
-                              // Use the primary color from the theme for the box background
-                              color: theme.colorScheme.primary.withOpacity(0.1),
+                              color: isSelected
+                                  ? theme.colorScheme.primary.withOpacity(0.1)
+                                  : subjectColor.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(16),
                             ),
                             child: Icon(
@@ -138,7 +135,9 @@ class AssignmentCard extends StatelessWidget {
                                   ? Icons.check_circle
                                   : IconData(subjectIcon,
                                       fontFamily: 'MaterialIcons'),
-                              color: subjectColor,
+                              color: isSelected
+                                  ? theme.colorScheme.primary
+                                  : subjectColor,
                               size: 24,
                             ),
                           ),
@@ -152,9 +151,7 @@ class AssignmentCard extends StatelessWidget {
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 17,
-                                    color: isDark
-                                        ? Colors.white
-                                        : const Color(0xFF1E293B),
+                                    color: theme.colorScheme.onSurface,
                                   ),
                                 ),
                                 Text(
@@ -190,7 +187,7 @@ class AssignmentCard extends StatelessWidget {
                               ],
                             ),
                           ),
-                          // Keep your popup menu but disable if in selection mode
+
                           if (!isSelected &&
                               (showExpandableButton || showRightButton))
                             PopupMenuButton<String>(
@@ -200,7 +197,8 @@ class AssignmentCard extends StatelessWidget {
                               ),
                               onSelected: (value) {
                                 if (value == 'delete')
-                                  assignment.delete();
+                                  DatabaseService.deleteAssignment(
+                                      assignment.id);
                                 else if (value == 'edit') {
                                   Navigator.push(
                                     context,

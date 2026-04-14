@@ -1,8 +1,9 @@
-import 'dart:ui';
-import 'package:assignmate/main.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
+import 'package:assignmate/main.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+//  SERVICES
 import 'package:assignmate/services/apptheme.dart';
+//------------------------------------------------------------
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -13,9 +14,7 @@ class SettingsScreen extends StatelessWidget {
       appBar: AppBar(title: const Text("Settings"), centerTitle: true),
       body: ListView(
         children: [
-          // Inside your SettingsScreen ListView
           _buildSectionHeader("Appearance"),
-
           const Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: Text(
@@ -23,10 +22,7 @@ class SettingsScreen extends StatelessWidget {
               style: TextStyle(fontWeight: FontWeight.w500),
             ),
           ),
-
           const SizedBox(height: 12),
-
-          // Horizontal List of Color Options
           SizedBox(
             height: 50,
             child: ListenableBuilder(
@@ -38,23 +34,15 @@ class SettingsScreen extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   children: [
                     _buildColorOption(
-                      context,
-                      const Color(0xFF6366F1),
-                    ), // Indigo
+                        context, const Color(0xFF6366F1)), // Indigo
                     _buildColorOption(context, const Color(0xFFF43F5E)), // Rose
                     _buildColorOption(
-                      context,
-                      const Color(0xFF10B981),
-                    ), // Emerald
+                        context, const Color(0xFF10B981)), // Emerald
                     _buildColorOption(
-                      context,
-                      const Color(0xFFF59E0B),
-                    ), // Amber
+                        context, const Color(0xFFF59E0B)), // Amber
                     _buildColorOption(context, const Color(0xFF3B82F6)), // Blue
                     _buildColorOption(
-                      context,
-                      const Color(0xFF8B5CF6),
-                    ), // Violet
+                        context, const Color(0xFF8B5CF6)), // Violet
                   ],
                 );
               },
@@ -101,11 +89,7 @@ class SettingsScreen extends StatelessWidget {
                         selected: {currentMode},
                         onSelectionChanged: (Set<ThemeMode> newSelection) {
                           final selectedMode = newSelection.first;
-
-                          // 1. Update UI
                           themeNotifier.value = selectedMode;
-
-                          // 2. Save to Hive safely
                           try {
                             var box = Hive.box('settingsBox');
                             box.put('themeMode', selectedMode.index);

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
-import '../models/assignment.dart';
-import '../models/subject.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'add_subject_screen.dart';
+//  MODELS
+import 'package:assignmate/models/assignment.dart';
+import 'package:assignmate/models/subject.dart';
+//  SCREENS
+import 'package:assignmate/screens/add_subject_screen.dart';
+//  SERVICES
+import 'package:assignmate/services/database_service.dart';
+//------------------------------------------------------------
 
 class AddAssignmentScreen extends StatefulWidget {
   final Assignment? assignment;
@@ -42,6 +47,7 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
     _titleController = TextEditingController(
       text: widget.assignment?.title ?? "",
     );
+    _selectedSubjectId = widget.assignment?.subjectId;
     _descController = TextEditingController(
       text: widget.assignment?.description ?? "",
     );
@@ -51,16 +57,15 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
   }
 
   void _saveAssignment() async {
-    final box = Hive.box<Assignment>('assignmentsBox');
     if (widget.assignment != null) {
       widget.assignment!.title = _titleController.text;
       widget.assignment!.subjectId = _selectedSubjectId;
       widget.assignment!.description = _descController.text;
       widget.assignment!.deadline = _selectedDate;
       widget.assignment!.status = _currentStatus;
-      await widget.assignment!.save();
+      await DatabaseService.saveAssignment(widget.assignment!);
     } else {
-      final newAsgn = Assignment(
+      final newAssignment = Assignment(
         id: const Uuid().v4(),
         title: _titleController.text,
         subjectId: _selectedSubjectId,
@@ -68,15 +73,14 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
         deadline: _selectedDate,
         status: _currentStatus,
       );
-      await box.put(newAsgn.id, newAsgn);
+      await DatabaseService.saveAssignment(newAssignment);
     }
     if (mounted) Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       appBar: AppBar(title: Text(widget.assignment != null ? "Edit" : "New")),
@@ -88,15 +92,13 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
             textInputAction: TextInputAction.next,
             controller: _titleController,
             onSubmitted: (_) {
-              // When 'Next' is pressed, jump to Subject
               FocusScope.of(context).requestFocus(_subjectFocus);
             },
             decoration: const InputDecoration(labelText: "Title"),
           ),
           const SizedBox(height: 16),
-          // In add_assignment_screen.dart
           ValueListenableBuilder(
-            valueListenable: Hive.box<Subject>('subjectsBox').listenable(),
+            valueListenable: DatabaseService.subjectBox.listenable(),
             builder: (context, Box<Subject> box, _) {
               final subjects = box.values.toList();
 
@@ -108,8 +110,11 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
                         value: sub.key,
                         child: Row(
                           children: [
-                            Icon(IconData(sub.iconCodePoint,
-                                fontFamily: 'MaterialIcons')),
+                            Icon(
+                              IconData(sub.iconCodePoint,
+                                  fontFamily: 'MaterialIcons'),
+                              color: Color(sub.colorValue),
+                            ),
                             const SizedBox(width: 10),
                             Text(sub.name),
                           ],

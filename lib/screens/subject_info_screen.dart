@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+//  MODELS
+import 'package:assignmate/models/assignment.dart';
+import 'package:assignmate/models/subject.dart';
+//  SCREENS
 import 'package:assignmate/screens/add_subject_screen.dart';
-import '../models/subject.dart';
-import '../models/assignment.dart';
+//  SERVICES
+import 'package:assignmate/services/database_service.dart';
+//------------------------------------------------------------
 
 class SubjectInfoScreen extends StatelessWidget {
   final Subject subject;
@@ -24,7 +29,6 @@ class SubjectInfoScreen extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  // Passing the current subject object here triggers "Edit Mode"
                   builder: (context) => AddSubjectScreen(subject: subject),
                 ),
               );
@@ -34,7 +38,6 @@ class SubjectInfoScreen extends StatelessWidget {
       ),
       body: Column(
         children: [
-          // Header Section
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 30),
@@ -81,13 +84,11 @@ class SubjectInfoScreen extends StatelessWidget {
           // List of Assignments for this subject
           Expanded(
             child: ValueListenableBuilder(
-              valueListenable:
-                  Hive.box<Assignment>('assignmentsBox').listenable(),
+              valueListenable: DatabaseService.assignmentBox.listenable(),
               builder: (context, Box<Assignment> box, _) {
                 // Filter assignments by the current subject's name
-                final filteredList = box.values
-                    .where((a) => a.subjectId == subject.key)
-                    .toList();
+                final filteredList =
+                    DatabaseService.getAssignments(subjectId: subject.key);
 
                 if (filteredList.isEmpty) {
                   return Center(

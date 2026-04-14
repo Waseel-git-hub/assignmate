@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+//  MODELS
 import 'package:assignmate/models/subject.dart';
-import 'package:assignmate/widgets/subject_card.dart'; // Import your new card
+//  SCREENS
 import 'package:assignmate/screens/add_subject_screen.dart';
 import 'package:assignmate/screens/subject_info_screen.dart';
+//  WIDGETS
+import 'package:assignmate/widgets/subject_card.dart';
+//  SERVICES
+import 'package:assignmate/services/database_service.dart';
+//------------------------------------------------------------
 
 class SubjectScreen extends StatefulWidget {
   const SubjectScreen({super.key});
@@ -13,7 +19,6 @@ class SubjectScreen extends StatefulWidget {
 }
 
 class _SubjectScreenState extends State<SubjectScreen> {
-  // 1. Define the state for selection
   final Set<dynamic> _selectedIds = {};
 
   void _toggleSelection(dynamic key) {
@@ -34,15 +39,12 @@ class _SubjectScreenState extends State<SubjectScreen> {
             ? "Subjects"
             : "${_selectedIds.length} Selected"),
         actions: [
-          // Inside your SubjectScreen AppBar actions
-          if (_selectedIds.length ==
-              1) // Only show edit if exactly one item is selected
+          if (_selectedIds.length == 1)
             IconButton(
               icon: const Icon(Icons.edit),
               onPressed: () {
-                // Find the actual subject object using the selected ID
                 final subjectToEdit =
-                    Hive.box<Subject>('subjectsBox').get(_selectedIds.first);
+                    DatabaseService.getSubjectById(_selectedIds.first);
 
                 if (subjectToEdit != null) {
                   Navigator.push(
@@ -52,7 +54,6 @@ class _SubjectScreenState extends State<SubjectScreen> {
                           AddSubjectScreen(subject: subjectToEdit),
                     ),
                   );
-                  // Clear selection after navigating
                   setState(() => _selectedIds.clear());
                 }
               },
@@ -61,9 +62,8 @@ class _SubjectScreenState extends State<SubjectScreen> {
             IconButton(
               icon: const Icon(Icons.delete_outline),
               onPressed: () {
-                final box = Hive.box<Subject>('subjectsBox');
                 for (var key in _selectedIds) {
-                  box.delete(key);
+                  DatabaseService.deleteSubject(key);
                 }
                 setState(() => _selectedIds.clear());
               },
@@ -71,7 +71,7 @@ class _SubjectScreenState extends State<SubjectScreen> {
         ],
       ),
       body: ValueListenableBuilder(
-        valueListenable: Hive.box<Subject>('subjectsBox').listenable(),
+        valueListenable: DatabaseService.subjectBox.listenable(),
         builder: (context, Box<Subject> box, _) {
           final subjects = box.values.toList();
 

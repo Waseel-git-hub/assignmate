@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import '../models/assignment.dart';
-import '../widgets/assignment_card.dart';
-import 'add_assignment_screen.dart';
-import '../widgets/status_helper.dart';
-import 'assignment_info_screen.dart';
-import '../services/database_service.dart';
+//  MODELS
+import 'package:assignmate/models/assignment.dart';
+//  SCREENS
+import 'package:assignmate/screens/add_assignment_screen.dart';
+import 'package:assignmate/screens/assignment_info_screen.dart';
+//  WIDGETS
+import 'package:assignmate/widgets/assignment_card.dart';
+import 'package:assignmate/widgets/status_helper.dart';
+//  SERVICES
+import 'package:assignmate/services/database_service.dart';
+//------------------------------------------------------------
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -45,9 +50,8 @@ class _HomeScreenState extends State<HomeScreen>
   void _clearSelection() => setState(() => _selectedIds.clear());
 
   void _deleteSelected() async {
-    final box = Hive.box<Assignment>('assignmentsBox');
     for (var id in _selectedIds) {
-      await box.delete(id);
+      await DatabaseService.deleteAssignment(id);
     }
     _clearSelection();
   }
@@ -56,8 +60,6 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
-    DatabaseService _dbService = DatabaseService();
     return Scaffold(
       appBar: _isSelectionMode
           ? AppBar(
@@ -72,6 +74,25 @@ class _HomeScreenState extends State<HomeScreen>
                 color: colorScheme.onPrimaryContainer,
               ),
               actions: [
+                if (_selectedIds.length == 1)
+                  IconButton(
+                      icon: const Icon(Icons.edit),
+                      onPressed: () {
+                        final assignmentToEdit =
+                            DatabaseService.getAssignmentById(
+                                _selectedIds.first);
+
+                        if (assignmentToEdit != null) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => AddAssignmentScreen(
+                                  assignment: assignmentToEdit),
+                            ),
+                          );
+                          setState(() => _selectedIds.clear());
+                        }
+                      }),
                 IconButton(
                   icon: const Icon(Icons.delete_outline),
                   onPressed: _deleteSelected,
@@ -82,20 +103,19 @@ class _HomeScreenState extends State<HomeScreen>
           : null,
       body: SafeArea(
         child: ValueListenableBuilder(
-          valueListenable: Hive.box<Assignment>('assignmentsBox').listenable(),
+          valueListenable: DatabaseService.assignmentBox.listenable(),
           builder: (context, Box<Assignment> box, _) {
-            // --- Date Logic for Grouping ---
+            // Date Logic for Grouping
             final now = DateTime.now();
             final today = DateTime(now.year, now.month, now.day);
             final tomorrow = today.add(const Duration(days: 1));
 
-            final pending = _dbService.getAssignments(
+            final pending = DatabaseService.getAssignments(
               completionStatus: 'PENDING',
             );
             // Sub-categories for Pending
-            final p_overdue = pending
-                .where((t) => t.deadline.isBefore(today))
-                .toList();
+            final p_overdue =
+                pending.where((t) => t.deadline.isBefore(today)).toList();
             final p_dueTomorrow = pending.where((t) {
               final d = t.deadline;
               final deadlineDate = DateTime(d.year, d.month, d.day);
@@ -106,12 +126,11 @@ class _HomeScreenState extends State<HomeScreen>
               final deadlineDate = DateTime(d.year, d.month, d.day);
               return deadlineDate.isAfter(tomorrow);
             }).toList();
-            final completed = _dbService.getAssignments(
+            final completed = DatabaseService.getAssignments(
               completionStatus: "COMPLETED",
             );
-            final c_overdue = completed
-                .where((t) => t.deadline.isBefore(today))
-                .toList();
+            final c_overdue =
+                completed.where((t) => t.deadline.isBefore(today)).toList();
             final c_dueTomorrow = completed.where((t) {
               final d = t.deadline;
               final deadlineDate = DateTime(d.year, d.month, d.day);
@@ -123,7 +142,7 @@ class _HomeScreenState extends State<HomeScreen>
               return deadlineDate.isAfter(tomorrow);
             }).toList();
 
-            final submitted = _dbService.getAssignments(
+            final submitted = DatabaseService.getAssignments(
               completionStatus: "SUBMITTED",
             );
 
@@ -160,7 +179,6 @@ class _HomeScreenState extends State<HomeScreen>
           },
         ),
       ),
-
       floatingActionButton: FloatingActionButton(
         backgroundColor: colorScheme.primary,
         onPressed: () => Navigator.push(
@@ -217,7 +235,6 @@ class _HomeScreenState extends State<HomeScreen>
               setState(() {});
             },
             onStatusUpdate: () {
-              // This makes the Home Screen rebuild so the "Completed" count updates
               setState(() {});
             },
           ),
@@ -279,7 +296,7 @@ class _HomeScreenState extends State<HomeScreen>
           onLongPress: () => _toggleSelection(assignment.id),
           onTap: () {
             if (_isSelectionMode) {
-              _toggleSelection(assignment.id);
+              _toggleSelection(assignment.key);
             } else {
               Navigator.push(
                 context,

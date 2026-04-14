@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import '../models/assignment.dart';
-import '../widgets/status_helper.dart';
-import 'add_assignment_screen.dart';
-import 'package:assignmate/models/subject.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+//  MODELS
+import 'package:assignmate/models/assignment.dart';
+//  SCREENS
+import 'package:assignmate/screens/add_assignment_screen.dart';
+//  WIDGETS
+import 'package:assignmate/widgets/status_helper.dart';
+//  SERVICES
+import 'package:assignmate/services/database_service.dart';
+//------------------------------------------------------------
 
 class AssignmentInfoScreen extends StatelessWidget {
   final Assignment assignment;
@@ -40,10 +44,9 @@ class AssignmentInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final primaryColor = Theme.of(context).colorScheme.primary;
-    final subject = Hive.box<Subject>('subjectsBox').get(assignment.subjectId);
-    final String displaySubject = subject?.name ?? "No Subject";
+    final theme = Theme.of(context);
+    final colorScheme = Theme.of(context).colorScheme;
+    final subject = DatabaseService.subjectBox.get(assignment.subjectId);
 
     return Scaffold(
         appBar: AppBar(
@@ -60,16 +63,18 @@ class AssignmentInfoScreen extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      // Use primaryContainer for a better themed background behind the icon
-                      color: Theme.of(context)
-                          .colorScheme
-                          .primaryContainer
-                          .withOpacity(0.4),
+                      color: Color(
+                              subject?.colorValue ?? colorScheme.primary.value)
+                          .withOpacity(0.3),
                       borderRadius: BorderRadius.circular(16),
                     ),
                     child: Icon(
-                      Icons.assignment_outlined,
-                      color: primaryColor,
+                      IconData(
+                        subject?.iconCodePoint ?? Icons.assignment.codePoint,
+                        fontFamily: 'MaterialIcons',
+                      ),
+                      color: Color(
+                          subject?.colorValue ?? colorScheme.primary.value),
                       size: 32,
                     ),
                   ),
@@ -86,7 +91,7 @@ class AssignmentInfoScreen extends StatelessWidget {
                           ),
                         ),
                         Text(
-                          displaySubject,
+                          subject?.name ?? 'Extra',
                           style:
                               TextStyle(fontSize: 16, color: Colors.grey[600]),
                         ),
@@ -113,39 +118,33 @@ class AssignmentInfoScreen extends StatelessWidget {
                     "Deadline",
                     DateFormat('MMM dd').format(assignment.deadline),
                     Icons.calendar_today_outlined,
-                    Colors.orange,
+                    colorScheme.secondary,
                   ),
                 ],
               ),
               const SizedBox(height: 32),
 
               // 3. Description Section
-              const Text(
+              Text(
                 "Description",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: colorScheme.onSurface),
               ),
               const SizedBox(height: 12),
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: isDark
-                      ? Theme.of(context).cardTheme.color
-                      : Theme.of(context).cardTheme.color,
+                  color: theme.cardTheme.color,
                   border: Border.all(
-                    color: isDark
-                        ? Colors.white.withOpacity(0.08)
-                        : Theme.of(context)
-                            .colorScheme
-                            .outlineVariant
-                            .withOpacity(0.5),
+                    color: colorScheme.outlineVariant.withOpacity(0.7),
                   ),
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: isDark
-                          ? Colors.transparent
-                          : Colors.black.withOpacity(0.03),
+                      color: Colors.black.withOpacity(0.03),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -158,7 +157,7 @@ class AssignmentInfoScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     height: 1.5,
-                    color: Theme.of(context).colorScheme.onSurface,
+                    color: colorScheme.onSurface,
                   ),
                 ),
               ),
@@ -212,10 +211,8 @@ class AssignmentInfoScreen extends StatelessWidget {
                           style: TextStyle(color: Colors.white),
                         ),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              Theme.of(context).colorScheme.primary,
-                          foregroundColor:
-                              Theme.of(context).colorScheme.onPrimary,
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           elevation: 0,
                           shape: RoundedRectangleBorder(
@@ -235,25 +232,19 @@ class AssignmentInfoScreen extends StatelessWidget {
     Color color,
   ) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     return Expanded(
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          // Use the theme's card color instead of Theme.of(context).cardColor
           color: theme.cardTheme.color,
-          // Match the border style from your AssignmentCard
           border: Border.all(
-            color: isDark
-                ? Colors.white.withOpacity(0.08)
-                : theme.colorScheme.outlineVariant.withOpacity(0.5),
+            color: theme.colorScheme.outlineVariant.withOpacity(0.7),
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color:
-                  isDark ? Colors.transparent : Colors.black.withOpacity(0.03),
+              color: Colors.black.withOpacity(0.03),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
