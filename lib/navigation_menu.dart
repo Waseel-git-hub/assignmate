@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'screens/home_screen.dart'; // Import your Home Screen
-import 'screens/settings_screen.dart'; // Import your Settings Screen
+//  SCREENS
+import 'screens/home_screen.dart';
+import 'screens/settings_screen.dart';
 import 'screens/subject_screen.dart';
+//------------------------------------------------------------------------------
 
 class NavigationMenu extends StatefulWidget {
   const NavigationMenu({super.key});
