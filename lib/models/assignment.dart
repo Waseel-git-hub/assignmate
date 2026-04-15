@@ -20,9 +20,12 @@ class Assignment extends HiveObject {
   DateTime deadline;
 
   @HiveField(5)
-  String status; // PENDING, COMPLETED, SUBMITTED, CORRECTED
+  DateTime? reminder;
 
   @HiveField(6)
+  String status; // PENDING, COMPLETED, SUBMITTED, CORRECTED
+
+  @HiveField(7)
   DateTime? submittedAt;
 
   Assignment({
@@ -31,6 +34,7 @@ class Assignment extends HiveObject {
     required this.subjectId,
     this.description = "",
     required this.deadline,
+    this.reminder,
     this.status = 'PENDING',
     this.submittedAt,
   });

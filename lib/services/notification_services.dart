@@ -3,6 +3,7 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'dart:io';
+import 'package:assignmate/services/database_service.dart';
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -58,10 +59,12 @@ class NotificationService {
   Future<void> scheduleAssignmentReminder({
     required String id,
     required String title,
-    required String subject,
+    required dynamic subjectId,
     required DateTime reminder,
     required DateTime deadline,
   }) async {
+    final String subjectName =
+        DatabaseService.subjectBox.get(subjectId)!.name ?? "Extra";
     final scheduleDate = reminder;
     if (scheduleDate.isBefore(DateTime.now())) return;
     final daysLeft = deadline.difference(reminder).inDays;
@@ -70,7 +73,7 @@ class NotificationService {
 
     await _plugin.zonedSchedule(
       id: id.hashCode,
-      title: 'Assignment Reminder: $subject',
+      title: 'Assignment Reminder: $subjectName',
       // Now the body matches the custom reminder time
       body: 'Your assignment "$title" is due $timePhrase.',
       scheduledDate: tz.TZDateTime.from(scheduleDate, tz.local),
