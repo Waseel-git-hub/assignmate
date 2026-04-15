@@ -3,7 +3,9 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'dart:io';
+//  SERVICES
 import 'package:assignmate/services/database_service.dart';
+//------------------------------------------------------------------------------
 
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
@@ -14,19 +16,19 @@ class NotificationService {
       FlutterLocalNotificationsPlugin();
 
   Future<void> init() async {
-    // 1. Initialize timezone database
+    // Initialize timezone database
     tz.initializeTimeZones();
     final TimezoneInfo tzObject = await FlutterTimezone.getLocalTimezone();
     final String tzName = tzObject.identifier;
 
-    // 3. Set local timezone
+    // Set local timezone
     tz.setLocalLocation(tz.getLocation(tzName));
 
-    // 4. Android Initialization Settings
+    // Android Initialization Settings
     const AndroidInitializationSettings androidSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
 
-    // 5. iOS/Darwin Settings
+    // iOS/Darwin Settings
     const DarwinInitializationSettings iosSettings =
         DarwinInitializationSettings(
       requestAlertPermission: true,
@@ -46,7 +48,7 @@ class NotificationService {
       },
     );
 
-    // 6. Request Android 13+ Permissions explicitly
+    // Request Android 13+ Permissions explicitly
     if (Platform.isAndroid) {
       await _plugin
           .resolvePlatformSpecificImplementation<
@@ -55,7 +57,7 @@ class NotificationService {
     }
   }
 
-  //// Schedule for reminder notification
+  // Schedule Reminder Notification
   Future<void> scheduleAssignmentReminder({
     required String id,
     required String title,
@@ -63,8 +65,7 @@ class NotificationService {
     required DateTime reminder,
     required DateTime deadline,
   }) async {
-    final String subjectName =
-        DatabaseService.subjectBox.get(subjectId)!.name ?? "Extra";
+    final String subjectName = DatabaseService.subjectBox.get(subjectId)!.name;
     final scheduleDate = reminder;
     if (scheduleDate.isBefore(DateTime.now())) return;
     final daysLeft = deadline.difference(reminder).inDays;
@@ -93,14 +94,14 @@ class NotificationService {
     );
   }
 
-  /// Fires a test notification 5 seconds after being called.
+  // Test Notification
   Future<void> showInstantTestNotification() async {
     await _plugin.zonedSchedule(
       id: 999,
       title: '🚀 Test Successful!',
       body: 'AssignMate notifications are working on your device.',
       scheduledDate:
-          tz.TZDateTime.now(tz.local).add(const Duration(seconds: 5)),
+          tz.TZDateTime.now(tz.local).add(const Duration(seconds: 1)),
       notificationDetails: const NotificationDetails(
         android: AndroidNotificationDetails(
           'test_channel',
