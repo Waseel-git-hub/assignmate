@@ -4,11 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:assignmate/services/apptheme.dart';
 import 'models/assignment.dart';
+import 'services/notification_services.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // Initialize Notification
+  await NotificationService().init();
   // Initialize Hive
   await Hive.initFlutter();
   // Register the Blueprint so Hive knows how to handle it
