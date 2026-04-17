@@ -96,16 +96,18 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
       );
       return;
     }
+    Assignment activeAssignment;
+
     if (widget.assignment != null) {
-      widget.assignment!.title = _titleController.text;
-      widget.assignment!.subjectId = _selectedSubjectId;
-      widget.assignment!.description = _descController.text;
-      widget.assignment!.deadline = _deadlineDate;
-      widget.assignment!.reminder = _reminderDate;
-      widget.assignment!.status = _currentStatus;
-      await DatabaseService.saveAssignment(widget.assignment!);
+      activeAssignment = widget.assignment!;
+      activeAssignment.title = _titleController.text.trim();
+      activeAssignment.subjectId = _selectedSubjectId;
+      activeAssignment.description = _descController.text.trim();
+      activeAssignment.deadline = _deadlineDate;
+      activeAssignment.reminder = _reminderDate;
+      activeAssignment.status = _currentStatus;
     } else {
-      final newAssignment = Assignment(
+      activeAssignment = Assignment(
         id: const Uuid().v4(),
         title: _titleController.text,
         subjectId: _selectedSubjectId,
@@ -114,15 +116,15 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
         reminder: _reminderDate,
         status: _currentStatus,
       );
-      await DatabaseService.saveAssignment(newAssignment);
     }
-    await NotificationService().cancelNotification(widget.assignment!.id);
+    await DatabaseService.saveAssignment(activeAssignment);
+    await NotificationService().cancelNotification(activeAssignment.id);
 
     if (_reminderDate != null && _reminderDate!.isAfter(DateTime.now())) {
       await NotificationService().scheduleAssignmentReminder(
-        id: widget.assignment!.id, // Now this won't be null
-        title: widget.assignment!.title,
-        subjectId: widget.assignment!.subjectId,
+        id: activeAssignment.id, // Now this won't be null
+        title: activeAssignment.title,
+        subjectId: activeAssignment.subjectId,
         reminder: _reminderDate!,
         deadline: _deadlineDate,
       );
