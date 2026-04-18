@@ -42,27 +42,10 @@ class AssignmentCard extends StatelessWidget {
     required this.onStatusUpdate,
   });
 
-  Color _getUrgencyColor(DateTime deadline, String status) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    if (status == 'PENDING') {
-      if (deadline.isBefore(today)) return Colors.redAccent;
-      if (deadline.difference(today).inDays <= 1) return Colors.orange;
-      return Colors.blueGrey;
-    }
-    if (status == 'COMPLETED') {
-      if (deadline.isBefore(today)) return Colors.redAccent;
-      if (deadline.difference(today).inDays <= 1) return Colors.green;
-      return Colors.blueGrey;
-    }
-
-    return Colors.green;
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final urgencyColor = _getUrgencyColor(
+    final urgencyColor = getUrgencyColor(
       assignment.deadline,
       assignment.status,
     );

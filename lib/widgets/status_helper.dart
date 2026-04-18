@@ -1,22 +1,5 @@
 import 'package:flutter/material.dart';
 
-Color getStatusColor(BuildContext context, String status) {
-  final colorScheme = Theme.of(context).colorScheme;
-
-  switch (status) {
-    case 'PENDING':
-      return colorScheme.outline; // Neutral grey-ish from theme
-    case 'COMPLETED':
-      return colorScheme.primary; // Indigo from theme
-    case 'SUBMITTED':
-      return Colors.green; // Semantic colors like Green are usually okay
-    case 'CORRECTED':
-      return Colors.teal;
-    default:
-      return colorScheme.outline;
-  }
-}
-
 // Helper to get the next status in your flow
 String getNextStatus(String currentStatus) {
   if (currentStatus == 'PENDING') return 'COMPLETED';
@@ -39,4 +22,21 @@ String rightButtonStatus(String currentStatus) {
   if (currentStatus == 'COMPLETED') return 'Submit';
   if (currentStatus == 'SUBMITTED') return 'Corrected';
   return currentStatus;
+}
+
+Color getUrgencyColor(DateTime deadline, String status) {
+  final now = DateTime.now();
+  final today = DateTime(now.year, now.month, now.day);
+  if (status == 'PENDING') {
+    if (deadline.isBefore(today)) return Colors.redAccent;
+    if (deadline.difference(today).inDays <= 1) return Colors.orange;
+    return Colors.blueGrey;
+  }
+  if (status == 'COMPLETED') {
+    if (deadline.isBefore(today)) return Colors.redAccent;
+    if (deadline.difference(today).inDays <= 1) return Colors.green;
+    return Colors.blueGrey;
+  }
+
+  return Colors.green;
 }

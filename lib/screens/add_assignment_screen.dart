@@ -83,22 +83,9 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
   }
 
   void _saveAssignment() async {
-    if (_titleController.text.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please enter a title")),
-      );
-      return;
-    }
-
-    if (_selectedSubjectId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please select a subject")),
-      );
-      return;
-    }
     Assignment activeAssignment;
 
-    if (widget.assignment != null) {
+    if (widget.assignment != null && widget.assignment!.id.isNotEmpty) {
       activeAssignment = widget.assignment!;
       activeAssignment.title = _titleController.text.trim();
       activeAssignment.subjectId = _selectedSubjectId;
@@ -109,9 +96,9 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
     } else {
       activeAssignment = Assignment(
         id: const Uuid().v4(),
-        title: _titleController.text,
+        title: _titleController.text.trim(),
         subjectId: _selectedSubjectId,
-        description: _descController.text,
+        description: _descController.text.trim(),
         deadline: _deadlineDate,
         reminder: _reminderDate,
         status: _currentStatus,
@@ -355,7 +342,8 @@ class _AddAssignmentScreenState extends State<AddAssignmentScreen> {
                   ),
                 ),
                 child: Text(
-                  widget.assignment != null
+                  (widget.assignment != null &&
+                          widget.assignment!.id.isNotEmpty)
                       ? "Update Assignment"
                       : "Save Assignment",
                   style: TextStyle(

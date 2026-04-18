@@ -110,7 +110,7 @@ class AssignmentInfoScreen extends StatelessWidget {
                     "Status",
                     assignment.status,
                     Icons.info_outline,
-                    getStatusColor(context, assignment.status),
+                    getUrgencyColor(assignment.deadline, assignment.status),
                   ),
                   const SizedBox(width: 16),
                   _buildInfoCard(

@@ -66,7 +66,7 @@ class DatabaseService {
     return Hive.box<Subject>(_subjectBoxName).get(id);
   }
 
-  // Delete Multiple Subjects and their associated assignments
+  // Delete Subject and associated assignments
   static Future<void> deleteSubject(dynamic subjectId) async {
     final sBox = Hive.box<Subject>(_subjectBoxName);
     final aBox = Hive.box<Assignment>(_assignmentBoxName);
