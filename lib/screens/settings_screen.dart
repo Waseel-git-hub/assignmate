@@ -4,10 +4,54 @@ import 'package:hive_flutter/hive_flutter.dart';
 //  SERVICES
 import 'package:assignmate/services/apptheme.dart';
 import 'package:assignmate/services/notification_services.dart';
+import 'package:assignmate/services/backup_service.dart';
 //------------------------------------------------------------
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
+
+  void _handleExport(BuildContext context) async {
+    try {
+      await BackupService.exportBackup();
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Backup shared successfully!")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Export failed: $e")),
+      );
+    }
+  }
+
+  void _handleImport(BuildContext context) async {
+    // 1. Show a confirmation dialog (Safety first!)
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Import Data?"),
+        content:
+            const Text("This will merge/overwrite existing data. Continue?"),
+        actions: [
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text("Cancel")),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Import"),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final success = await BackupService.importBackup();
+      if (success && context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Backup Restored! Restarting view...")),
+        );
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,6 +186,24 @@ class SettingsScreen extends StatelessWidget {
           ),
 
           const Divider(),
+
+          _buildSectionHeader("Data & Backup"),
+
+          ListTile(
+            leading: const Icon(Icons.upload_file),
+            title: const Text("Export Backup"),
+            subtitle:
+                const Text("Save your subjects and assignments to a file"),
+            onTap: () => _handleExport(context),
+          ),
+
+          ListTile(
+            leading: const Icon(Icons.download_for_offline),
+            title: const Text("Import Backup"),
+            subtitle:
+                const Text("Restore data from a previously saved JSON file"),
+            onTap: () => _handleImport(context),
+          ),
         ],
       ),
     );
