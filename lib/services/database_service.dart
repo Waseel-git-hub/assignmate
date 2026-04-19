@@ -2,6 +2,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 //  MODELS
 import 'package:assignmate/models/assignment.dart';
 import 'package:assignmate/models/subject.dart';
+//  SERVCES
+import 'package:assignmate/services/notification_services.dart';
 //--------------------------------------------------------------------
 
 class DatabaseService {
@@ -44,8 +46,8 @@ class DatabaseService {
 
   // Delete an assignment
   static Future<void> deleteAssignment(String id) async {
-    final box = Hive.box<Assignment>(_assignmentBoxName);
-    await box.delete(id);
+    NotificationService().cancelNotification(id);
+    await assignmentBox.delete(id);
   }
 
 //-------------------SUBJECT------------------------

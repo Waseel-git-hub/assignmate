@@ -114,13 +114,19 @@ class _HomeScreenState extends State<HomeScreen>
               completionStatus: 'PENDING',
             );
             // Sub-categories for Pending
-            final p_overdue =
-                pending.where((t) => t.deadline.isBefore(today)).toList();
+            final p_overdue = pending.where((t) {
+              final deadlineDate =
+                  DateTime(t.deadline.year, t.deadline.month, t.deadline.day);
+              return deadlineDate.isBefore(today);
+            }).toList();
+
             final p_dueTomorrow = pending.where((t) {
               final d = t.deadline;
               final deadlineDate = DateTime(d.year, d.month, d.day);
               return deadlineDate.isAtSameMomentAs(tomorrow);
             }).toList();
+
+            // Anything that is NOT overdue and NOT tomorrow is upcoming
             final p_upcoming = pending.where((t) {
               final d = t.deadline;
               final deadlineDate = DateTime(d.year, d.month, d.day);
