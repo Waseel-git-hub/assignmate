@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:intl/intl.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
-import 'package:share_plus/share_plus.dart';
 //  MODELS
 import 'package:assignmate/models/assignment.dart';
 import 'package:assignmate/models/subject.dart';
@@ -11,60 +11,58 @@ import 'package:assignmate/models/subject.dart';
 import 'package:assignmate/services/database_service.dart';
 
 class BackupService {
-  /// Exports Hive data to a JSON file and opens the Share Sheet
-  static Future<void> exportBackup() async {
-    try {
-      final assignmentBox = DatabaseService.assignmentBox;
-      final subjectBox = DatabaseService.subjectBox;
-      final subjectsData = subjectBox.keys.map((key) {
-        final s = subjectBox.get(key)!;
-        return {
-          'key': key, // Save the actual Hive key
-          'name': s.name,
-          'iconCodePoint': s.iconCodePoint,
-          'colorValue': s.colorValue,
-        };
-      }).toList();
+  static String _prepareJsonData() {
+    final assignments = DatabaseService.assignmentBox.values.toList();
+    final subjects = DatabaseService.subjectBox.values.toList();
 
-      // 2. Export Assignments
-      final assignmentsData = assignmentBox.values
+    final data = {
+      'subjects': subjects
+          .map((s) => {
+                'key': s.key,
+                'name': s.name,
+                'iconCodePoint': s.iconCodePoint,
+                'colorValue': s.colorValue,
+              })
+          .toList(),
+      'assignments': assignments
           .map((a) => {
                 'id': a.id,
                 'title': a.title,
                 'subjectId': a.subjectId,
-                'description': a.description,
                 'deadline': a.deadline.toIso8601String(),
-                'reminder': a.reminder?.toIso8601String(),
                 'status': a.status,
-                'submittedAt': a.submittedAt?.toIso8601String(),
+                'description': a.description,
               })
-          .toList();
+          .toList(),
+    };
+    return jsonEncode(data);
+  }
 
-      final backupData = {
-        'subjects': subjectsData,
-        'assignments': assignmentsData,
-      };
+  static Future<void> saveToDevice() async {
+    final jsonString = _prepareJsonData();
+    final fileName =
+        "AssignMate_Backup_${DateFormat('yyyyMMdd').format(DateTime.now())}.json";
 
-      String jsonString = jsonEncode(backupData);
+    await FilePicker.saveFile(
+      dialogTitle: 'Select Save Location',
+      fileName: fileName,
+      type: FileType.custom,
+      allowedExtensions: ['json'],
+      bytes: utf8.encode(jsonString),
+    );
+  }
 
-      // 3. Save and Share
-      final directory = await getTemporaryDirectory();
-      final String timestamp =
-          DateFormat('yyyyMMdd_HHmm').format(DateTime.now());
-      final File file =
-          File('${directory.path}/AssignMate_Full_Backup_$timestamp.json');
-      await file.writeAsString(jsonString);
+  // OPTION B: Share Sheet
+  static Future<void> shareBackup() async {
+    final jsonString = _prepareJsonData();
+    final directory = await getTemporaryDirectory();
+    final file = File('${directory.path}/AssignMate_Backup.json');
+    await file.writeAsString(jsonString);
 
-      await Share.shareXFiles(
-        [
-          XFile(file.path, mimeType: 'application/json')
-        ], // Add the mimeType here
-        text: 'AssignMate Full Data Backup',
-        subject: 'AssignMate Backup', // Subject helps Android categorize it
-      );
-    } catch (e) {
-      throw Exception("Export failed: $e");
-    }
+    await Share.shareXFiles(
+      [XFile(file.path, mimeType: 'application/json')],
+      subject: 'AssignMate Data Backup',
+    );
   }
 
   /// Opens file picker, reads JSON, and saves to Hive

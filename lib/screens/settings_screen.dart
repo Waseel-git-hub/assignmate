@@ -5,22 +5,52 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:assignmate/services/apptheme.dart';
 import 'package:assignmate/services/notification_services.dart';
 import 'package:assignmate/services/backup_service.dart';
-//------------------------------------------------------------
+//------------------------------------------------------------------------------
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
-  void _handleExport(BuildContext context) async {
-    try {
-      await BackupService.exportBackup();
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Backup shared successfully!")),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Export failed: $e")),
-      );
-    }
+  void _showExportOptions(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Export Backup",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              ListTile(
+                leading: const Icon(Icons.save_alt),
+                title: const Text("Save to Device"),
+                subtitle: const Text("Choose a folder on your phone"),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await BackupService.saveToDevice();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.share),
+                title: const Text("Share via App"),
+                subtitle: const Text("Send via WhatsApp, Email, or Drive"),
+                onTap: () async {
+                  Navigator.pop(context);
+                  await BackupService.shareBackup();
+                },
+              ),
+              const SizedBox(height: 10),
+            ],
+          ),
+        );
+      },
+    );
   }
 
   void _handleImport(BuildContext context) async {
@@ -194,7 +224,7 @@ class SettingsScreen extends StatelessWidget {
             title: const Text("Export Backup"),
             subtitle:
                 const Text("Save your subjects and assignments to a file"),
-            onTap: () => _handleExport(context),
+            onTap: () => _showExportOptions(context),
           ),
 
           ListTile(
