@@ -7,10 +7,8 @@ import '../services/notification_services.dart';
 //--------------------------------------------------------------------
 
 class DatabaseService {
-  static const String _assignmentBoxName = "assignmentsBox";
-  static const String _subjectBoxName = "subjectsBox";
-  static final assignmentBox = Hive.box<Assignment>(_assignmentBoxName);
-  static final subjectBox = Hive.box<Subject>(_subjectBoxName);
+  static final assignmentBox = Hive.box<Assignment>('assignmentsBox');
+  static final subjectBox = Hive.box<Subject>('subjectsBox');
 
 //---------------ASSIGNMENT-----------------------
 
@@ -65,19 +63,17 @@ class DatabaseService {
   // Get a specific subject by its ID (key)
   static Subject? getSubjectById(dynamic id) {
     if (id == null) return null;
-    return Hive.box<Subject>(_subjectBoxName).get(id);
+    return subjectBox.get(id);
   }
 
   // Delete Subject and associated assignments
   static Future<void> deleteSubject(dynamic subjectId) async {
-    final sBox = Hive.box<Subject>(_subjectBoxName);
-    final aBox = Hive.box<Assignment>(_assignmentBoxName);
     final linkedAssignments =
-        aBox.values.where((a) => a.subjectId == subjectId).toList();
+        assignmentBox.values.where((a) => a.subjectId == subjectId).toList();
 
     for (var a in linkedAssignments) {
       await a.delete(); // delete assignment
     }
-    await sBox.delete(subjectId); // delete subject
+    await subjectBox.delete(subjectId); // delete subject
   }
 }
