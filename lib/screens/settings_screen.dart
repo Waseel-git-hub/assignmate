@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:assignmate/main.dart';
+import '../main.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 //  SERVICES
-import 'package:assignmate/services/apptheme.dart';
-import 'package:assignmate/services/notification_services.dart';
-import 'package:assignmate/services/backup_service.dart';
+import '../services/apptheme.dart';
+import '../services/notification_services.dart';
+import '../services/backup_service.dart';
 //------------------------------------------------------------------------------
 
 class SettingsScreen extends StatelessWidget {

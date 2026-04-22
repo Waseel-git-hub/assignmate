@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 //  MODELS
-import 'package:assignmate/models/assignment.dart';
+import '../models/assignment.dart';
 //  SCREENS
-import 'package:assignmate/screens/add_assignment_screen.dart';
-import 'package:assignmate/screens/assignment_info_screen.dart';
+import '../screens/add_assignment_screen.dart';
+import '../screens/assignment_info_screen.dart';
 //  WIDGETS
-import 'package:assignmate/widgets/assignment_card.dart';
-import 'package:assignmate/widgets/status_helper.dart';
+import '../widgets/assignment_card.dart';
+import '../widgets/status_helper.dart';
 //  SERVICES
-import 'package:assignmate/services/database_service.dart';
+import '../services/database_service.dart';
 //------------------------------------------------------------
 
 class HomeScreen extends StatefulWidget {

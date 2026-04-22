@@ -2,7 +2,7 @@ import 'package:hive/hive.dart';
 
 part 'assignment.g.dart';
 
-@HiveType(typeId: 0)
+@HiveType(typeId: 1)
 class Assignment extends HiveObject {
   @HiveField(0)
   String id;

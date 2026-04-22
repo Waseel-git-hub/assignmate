@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 //  MODELS
-import 'package:assignmate/models/assignment.dart';
+import '../models/assignment.dart';
 //  SCREENS
-import 'package:assignmate/screens/add_assignment_screen.dart';
+import '../screens/add_assignment_screen.dart';
 //  WIDGETS
-import 'package:assignmate/widgets/status_helper.dart';
+import '../widgets/status_helper.dart';
 //  SERVICES
-import 'package:assignmate/services/database_service.dart';
+import '../services/database_service.dart';
 //------------------------------------------------------------
 
 class AssignmentInfoScreen extends StatelessWidget {

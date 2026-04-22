@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 //  MODELS
-import 'package:assignmate/models/subject.dart';
+import '../models/subject.dart';
 //  SCREENS
-import 'package:assignmate/screens/add_subject_screen.dart';
-import 'package:assignmate/screens/subject_info_screen.dart';
+import '../screens/add_subject_screen.dart';
+import '../screens/subject_info_screen.dart';
 //  WIDGETS
-import 'package:assignmate/widgets/subject_card.dart';
+import '../widgets/subject_card.dart';
 //  SERVICES
-import 'package:assignmate/services/database_service.dart';
+import '../services/database_service.dart';
 //------------------------------------------------------------
 
 class SubjectScreen extends StatefulWidget {

@@ -1,9 +1,9 @@
 import 'package:hive_flutter/hive_flutter.dart';
 //  MODELS
-import 'package:assignmate/models/assignment.dart';
-import 'package:assignmate/models/subject.dart';
+import '../models/assignment.dart';
+import '../models/subject.dart';
 //  SERVCES
-import 'package:assignmate/services/notification_services.dart';
+import '../services/notification_services.dart';
 //--------------------------------------------------------------------
 
 class DatabaseService {

@@ -8,7 +8,7 @@ part of 'assignment.dart';
 
 class AssignmentAdapter extends TypeAdapter<Assignment> {
   @override
-  final int typeId = 0;
+  final int typeId = 1;
 
   @override
   Assignment read(BinaryReader reader) {

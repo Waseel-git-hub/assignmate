@@ -5,10 +5,10 @@ import 'package:share_plus/share_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:file_picker/file_picker.dart';
 //  MODELS
-import 'package:assignmate/models/assignment.dart';
-import 'package:assignmate/models/subject.dart';
+import '../models/assignment.dart';
+import '../models/subject.dart';
 //  SERVICES
-import 'package:assignmate/services/database_service.dart';
+import '../services/database_service.dart';
 
 class BackupService {
   static String _prepareJsonData() {

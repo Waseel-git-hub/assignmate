@@ -4,7 +4,7 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'dart:io';
 //  SERVICES
-import 'package:assignmate/services/database_service.dart';
+import '../services/database_service.dart';
 //------------------------------------------------------------------------------
 
 class NotificationService {
