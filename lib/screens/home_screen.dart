@@ -3,8 +3,8 @@ import 'package:hive_flutter/hive_flutter.dart';
 //  MODELS
 import '../models/assignment.dart';
 //  SCREENS
-import '../screens/add_assignment_screen.dart';
-import '../screens/assignment_info_screen.dart';
+import 'assignment/add_assignment_screen.dart';
+import 'assignment/assignment_info_screen.dart';
 //  WIDGETS
 import '../widgets/assignment_card.dart';
 import '../widgets/status_helper.dart';

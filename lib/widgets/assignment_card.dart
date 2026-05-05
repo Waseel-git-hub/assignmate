@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 //  MODELS
 import '../models/assignment.dart';
 //  SCREENS
-import '../screens/add_assignment_screen.dart';
+import '../screens/assignment/add_assignment_screen.dart';
 //  WIDGETS
 import '../widgets/status_helper.dart';
 //  SERVICES

@@ -3,13 +3,13 @@ import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 //  MODELS
-import '../models/assignment.dart';
-import '../models/subject.dart';
+import '../../models/assignment.dart';
+import '../../models/subject.dart';
 //  SCREENS
-import '../screens/add_subject_screen.dart';
+import '../subject/add_subject_screen.dart';
 //  SERVICES
-import '../services/database_service.dart';
-import '../services/notification_services.dart';
+import '../../services/database_service.dart';
+import '../../services/notification_services.dart';
 //------------------------------------------------------------
 
 class AddAssignmentScreen extends StatefulWidget {

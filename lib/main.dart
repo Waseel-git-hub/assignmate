@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:assignmate/navigation_menu.dart';
+import '../navigation_menu.dart';
 //  MODELS
-import 'package:assignmate/models/assignment.dart';
-import 'package:assignmate/models/subject.dart';
+import '../models/assignment.dart';
+import '../models/subject.dart';
 //  SERVICES
-import 'package:assignmate/services/apptheme.dart';
-import 'package:assignmate/services/notification_services.dart';
+import '../services/apptheme.dart';
+import '../services/notification_services.dart';
 
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.system);
 

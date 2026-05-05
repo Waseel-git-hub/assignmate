@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 //  MODELS
-import '../models/assignment.dart';
-import '../models/subject.dart';
+import '../../models/assignment.dart';
+import '../../models/subject.dart';
 //  SCREENS
-import '../screens/add_assignment_screen.dart';
-import '../screens/add_subject_screen.dart';
-import '../screens/assignment_info_screen.dart';
+import '../assignment/add_assignment_screen.dart';
+import '../subject/add_subject_screen.dart';
+import '../assignment/assignment_info_screen.dart';
 //  SERVICES
-import '../services/database_service.dart';
+import '../../services/database_service.dart';
 //  WIDGETS
-import '../widgets/status_helper.dart';
+import '../../widgets/status_helper.dart';
 //------------------------------------------------------------
 
 class SubjectInfoScreen extends StatelessWidget {
